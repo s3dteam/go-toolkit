@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"checksumSHA1": "LKVPIXruMhnSdda8oOm1+Np68hY=",
+			"path": "github.com/gorilla/websocket",
+			"revision": "5ed622c449da6d44c3c8329331ff47a9e5844f71",
+			"revisionTime": "2018-06-05T20:25:52Z"
+		},
+		{
+			"checksumSHA1": "+KXIuSABjUiYbIqUi1EEYS1i92o=",
+			"path": "github.com/rs/cors",
+			"revision": "15587285ef6b6e7a3f657e2e00f9f271883bcf22",
+			"revisionTime": "2018-07-31T07:12:13Z"
+		}
+	],
+	"rootPath": "github.com/go-toolkit"
+}
