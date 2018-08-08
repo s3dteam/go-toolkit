@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Loopring/relay/log"
 	"github.com/gomodule/redigo/redis"
+	"github.com/webbergao1/go-toolkit/log"
 )
 
 type RedisOptions struct {
@@ -22,6 +22,7 @@ type RedisOptions struct {
 type RedisCacheService struct {
 	options RedisOptions
 	pool    *redis.Pool
+	log     log.Logger
 }
 
 // Initialize redis service init
@@ -43,13 +44,13 @@ func (service *RedisCacheService) Initialize(redisCfg interface{}) {
 				err error
 			)
 			if c, err = redis.Dial("tcp", address); err != nil {
-				log.Error("redis conn fail", "conn", address, "error", err)
+				service.log.Error("redis conn fail", "conn", address, "error", err)
 				return nil, err
 			}
 			if len(options.Password) > 0 {
 				if _, err = c.Do("AUTH", options.Password); err != nil {
 					c.Close()
-					log.Error("redis auth fail", "auth", options.Password, "error", err)
+					service.log.Error("redis auth fail", "auth", options.Password, "error", err)
 					return nil, err
 				}
 			}
@@ -75,13 +76,13 @@ func (service *RedisCacheService) Set(key string, value []byte, ttl int64) error
 	defer conn.Close()
 
 	if _, err := conn.Do("set", key, value); err != nil {
-		log.Error("redis String set", "key", key, "error", err.Error())
+		service.log.Error("redis String set", "key", key, "error", err.Error())
 		return err
 	}
 
 	if ttl > 0 {
 		if _, err := conn.Do("expire", key, ttl); err != nil {
-			log.Error("redis String expire", "key", key, "ttl", ttl, "error", err.Error())
+			service.log.Error("redis String expire", "key", key, "ttl", ttl, "error", err.Error())
 			return err
 		}
 	}
@@ -94,10 +95,10 @@ func (service *RedisCacheService) Get(key string) ([]byte, error) {
 
 	reply, err := conn.Do("get", key)
 	if nil != err {
-		log.Error("redis String get", "key", key, "error", err.Error())
+		service.log.Error("redis String get", "key", key, "error", err.Error())
 		return []byte{}, err
 	} else if nil == reply {
-		log.Debug("redis String get, no this key", "key", key)
+		service.log.Debug("redis String get, no this key", "key", key)
 		return []byte{}, err
 	} else {
 		return reply.([]byte), err
@@ -119,14 +120,14 @@ func (service *RedisCacheService) Mset(keyvalues [][2][]byte, ttl int64) error {
 	}
 
 	if _, err := conn.Do("mset", list...); err != nil {
-		log.Error("redis String mset", "keyvalues", keyvalues, "error", err.Error())
+		service.log.Error("redis String mset", "keyvalues", keyvalues, "error", err.Error())
 		return err
 	}
 
 	if ttl > 0 {
 		for _, kv := range keyvalues {
 			if _, err := conn.Do("expire", kv[0], ttl); err != nil {
-				log.Error("redis String expire", "key", kv[0], "error", err.Error())
+				service.log.Error("redis String expire", "key", kv[0], "error", err.Error())
 				return err
 			}
 		}
@@ -148,10 +149,10 @@ func (service *RedisCacheService) Mget(keys []string) ([][]byte, error) {
 	reply, err := conn.Do("mget", list...)
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis String mget", "key", keys, "error", err.Error())
+		service.log.Error("redis String mget", "key", keys, "error", err.Error())
 		return [][]byte{}, err
 	} else if nil == reply {
-		log.Debug("redis String get, no this key", "key", keys)
+		service.log.Debug("redis String get, no this key", "key", keys)
 		return [][]byte{}, err
 	} else {
 		rs := reply.([]interface{})
@@ -172,7 +173,7 @@ func (service *RedisCacheService) Exists(key string) (bool, error) {
 
 	reply, err := conn.Do("exists", key)
 	if err != nil {
-		log.Error("redis String exists", "key", key, "error", err.Error())
+		service.log.Error("redis String exists", "key", key, "error", err.Error())
 		return false, err
 	} else {
 		exists, _ := reply.(int64)
@@ -190,7 +191,7 @@ func (service *RedisCacheService) Del(key string) error {
 
 	_, err := conn.Do("del", key)
 	if nil != err {
-		log.Error("redis String del", "key", key, "error", err.Error())
+		service.log.Error("redis String del", "key", key, "error", err.Error())
 	}
 	return err
 }
@@ -210,9 +211,9 @@ func (service *RedisCacheService) Dels(keys []string) error {
 
 	num, err := conn.Do("del", list...)
 	if err != nil {
-		log.Error("redis String dels", "key", list, "error", err.Error())
+		service.log.Error("redis String dels", "key", list, "error", err.Error())
 	} else {
-		log.Debug("redis String dels", "num", num.(int64))
+		service.log.Debug("redis String dels", "num", num.(int64))
 	}
 
 	return nil
@@ -226,7 +227,7 @@ func (service *RedisCacheService) Keys(keyFormat string) ([][]byte, error) {
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis String keys", "error", err.Error())
+		service.log.Error("redis String keys", "error", err.Error())
 	} else if nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -250,11 +251,11 @@ func (service *RedisCacheService) SAdd(key string, ttl int64, members ...[]byte)
 	}
 	_, err := conn.Do("sadd", vs...)
 	if nil != err {
-		log.Error("redis set sadd", "key", key, "error", err.Error())
+		service.log.Error("redis set sadd", "key", key, "error", err.Error())
 	}
 	if ttl > 0 {
 		if _, err := conn.Do("expire", key, ttl); err != nil {
-			log.Error("redis set expire", "key", key, "error", err.Error())
+			service.log.Error("redis set expire", "key", key, "error", err.Error())
 			return err
 		}
 	}
@@ -273,7 +274,7 @@ func (service *RedisCacheService) SRem(key string, members ...[]byte) (int64, er
 	reply, err := conn.Do("srem", vs...)
 
 	if err != nil {
-		log.Error("redis set srem", "key", key, "error", err.Error())
+		service.log.Error("redis set srem", "key", key, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -288,7 +289,7 @@ func (service *RedisCacheService) SCard(key string) (int64, error) {
 	reply, err := conn.Do("scard", key)
 
 	if err != nil {
-		log.Error("redis set scard", "key", key, "error", err.Error())
+		service.log.Error("redis set scard", "key", key, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -302,7 +303,7 @@ func (service *RedisCacheService) SIsMember(key string, member []byte) (bool, er
 
 	reply, err := conn.Do("sismember", key, member)
 	if err != nil {
-		log.Error("redis set sismember", "key", key, "member", member, "error", err.Error())
+		service.log.Error("redis set sismember", "key", key, "member", member, "error", err.Error())
 		return false, err
 	} else {
 		return reply.(int64) > 0, nil
@@ -317,7 +318,7 @@ func (service *RedisCacheService) SMembers(key string) ([][]byte, error) {
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis set smembers", "key", key, "error", err.Error())
+		service.log.Error("redis set smembers", "key", key, "error", err.Error())
 	} else if nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -342,11 +343,11 @@ func (service *RedisCacheService) ZAdd(key string, ttl int64, args ...[]byte) er
 	}
 	_, err := conn.Do("zadd", vs...)
 	if nil != err {
-		log.Error("redis zset zadd", "key", key, "error", err.Error())
+		service.log.Error("redis zset zadd", "key", key, "error", err.Error())
 	}
 	if ttl > 0 {
 		if _, err := conn.Do("expire", key, ttl); err != nil {
-			log.Error("redis zset expire", "key", key, "error", err.Error())
+			service.log.Error("redis zset expire", "key", key, "error", err.Error())
 			return err
 		}
 	}
@@ -364,7 +365,7 @@ func (service *RedisCacheService) ZRem(key string, args ...[]byte) (int64, error
 	}
 	reply, err := conn.Do("zrem", vs...)
 	if nil != err {
-		log.Error("redis zset zrem", "key", key, "error", err.Error())
+		service.log.Error("redis zset zrem", "key", key, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -378,7 +379,7 @@ func (service *RedisCacheService) ZCard(key string) (int64, error) {
 
 	reply, err := conn.Do("zcard", key)
 	if nil != err {
-		log.Error("redis zset zcard", "key", key, "error", err.Error())
+		service.log.Error("redis zset zcard", "key", key, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -396,7 +397,7 @@ func (service *RedisCacheService) ZRank(key string, member []byte) (int64, error
 
 	reply, err := conn.Do("zrank", vs...)
 	if nil != err {
-		log.Error("redis zset zrank", "key", key, "member", member, "error", err.Error())
+		service.log.Error("redis zset zrank", "key", key, "member", member, "error", err.Error())
 		return -1, err
 	} else if reply == nil {
 		return -1, err
@@ -416,7 +417,7 @@ func (service *RedisCacheService) ZRevRank(key string, member []byte) (int64, er
 
 	reply, err := conn.Do("zrevrank", vs...)
 	if nil != err {
-		log.Error("redis zset zrevrank", "key", key, "member", member, "error", err.Error())
+		service.log.Error("redis zset zrevrank", "key", key, "member", member, "error", err.Error())
 		return -1, err
 	} else if reply == nil {
 		return -1, err
@@ -439,7 +440,7 @@ func (service *RedisCacheService) ZRange(key string, start, stop int64, withScor
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis zset zrange", "key", key, "range", start, stop, "error", err.Error())
+		service.log.Error("redis zset zrange", "key", key, "range", start, stop, "error", err.Error())
 	} else if nil == err && nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -466,7 +467,7 @@ func (service *RedisCacheService) ZRangeByScore(key string, min, max interface{}
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis zset zrangebyscore", "key", key, "range", min, max, "error", err.Error())
+		service.log.Error("redis zset zrangebyscore", "key", key, "range", min, max, "error", err.Error())
 	} else if nil == err && nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -493,7 +494,7 @@ func (service *RedisCacheService) ZRevRange(key string, start, stop int64, withS
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis zset zrevrange", "key", key, "range", start, stop, "error", err.Error())
+		service.log.Error("redis zset zrevrange", "key", key, "range", start, stop, "error", err.Error())
 	} else if nil == err && nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -519,11 +520,11 @@ func (service *RedisCacheService) HSet(key string, ttl int64, field string, valu
 
 	_, err := conn.Do("hset", vs...)
 	if nil != err {
-		log.Error("redis hash hset", "key", key, "filed", field, "value", value, "error", err.Error())
+		service.log.Error("redis hash hset", "key", key, "filed", field, "value", value, "error", err.Error())
 	}
 	if ttl > 0 {
 		if _, err := conn.Do("expire", key, ttl); err != nil {
-			log.Error("redis hash hset", "key", key, "filed", field, "error", err.Error())
+			service.log.Error("redis hash hset", "key", key, "filed", field, "error", err.Error())
 			return err
 		}
 	}
@@ -541,10 +542,10 @@ func (service *RedisCacheService) HGet(key string, field []byte) ([]byte, error)
 	reply, err := conn.Do("hget", vs...)
 
 	if nil != err {
-		log.Error("redis hash hget", "key", key, "filed", field, "error", err.Error())
+		service.log.Error("redis hash hget", "key", key, "filed", field, "error", err.Error())
 		return []byte{}, err
 	} else if nil == reply {
-		log.Debug("redis hash hget", "key", key, "filed", field)
+		service.log.Debug("redis hash hget", "key", key, "filed", field)
 		return []byte{}, err
 	} else {
 		return reply.([]byte), err
@@ -565,11 +566,11 @@ func (service *RedisCacheService) HMSet(key string, ttl int64, args ...[]byte) e
 	}
 	_, err := conn.Do("hmset", vs...)
 	if nil != err {
-		log.Error("redis hash hmset", "key", key, "error", err.Error())
+		service.log.Error("redis hash hmset", "key", key, "error", err.Error())
 	}
 	if ttl > 0 {
 		if _, err := conn.Do("expire", key, ttl); err != nil {
-			log.Error("redis hash hmset", "key", key, "error", err.Error())
+			service.log.Error("redis hash hmset", "key", key, "error", err.Error())
 			return err
 		}
 	}
@@ -589,7 +590,7 @@ func (service *RedisCacheService) HMGet(key string, fields ...[]byte) ([][]byte,
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis hash hmget", "key", key, "error", err.Error())
+		service.log.Error("redis hash hmget", "key", key, "error", err.Error())
 	} else if nil == err && nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -615,7 +616,7 @@ func (service *RedisCacheService) HDel(key string, fields ...[]byte) (int64, err
 	reply, err := conn.Do("hdel", vs...)
 
 	if err != nil {
-		log.Error("redis hash hdel", "key", key, "fields", fields, "error", err.Error())
+		service.log.Error("redis hash hdel", "key", key, "fields", fields, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -629,7 +630,7 @@ func (service *RedisCacheService) HExists(key string, field []byte) (bool, error
 
 	reply, err := conn.Do("hexists", key, field)
 	if nil != err {
-		log.Error("redis hash hexists", "key", key, "field", field, "error", err.Error())
+		service.log.Error("redis hash hexists", "key", key, "field", field, "error", err.Error())
 	} else if nil == err && nil != reply {
 		exists := reply.(int64)
 		return exists > 0, nil
@@ -646,7 +647,7 @@ func (service *RedisCacheService) HKeys(key string) ([][]byte, error) {
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis hash hkeys", "key", key, "error", err.Error())
+		service.log.Error("redis hash hkeys", "key", key, "error", err.Error())
 	} else if nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -664,7 +665,7 @@ func (service *RedisCacheService) HVals(key string) ([][]byte, error) {
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis hash hvals", "key", key, "error", err.Error())
+		service.log.Error("redis hash hvals", "key", key, "error", err.Error())
 	} else if nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -682,7 +683,7 @@ func (service *RedisCacheService) HGetAll(key string) ([][]byte, error) {
 
 	res := [][]byte{}
 	if nil != err {
-		log.Error("redis hash hgetall", "key", key, "error", err.Error())
+		service.log.Error("redis hash hgetall", "key", key, "error", err.Error())
 	} else if nil != reply {
 		rs := reply.([]interface{})
 		for _, r := range rs {
@@ -699,7 +700,7 @@ func (service *RedisCacheService) HLen(key string) (int64, error) {
 	reply, err := conn.Do("hlen", key)
 
 	if nil != err {
-		log.Error("redis hash hlen", "key", key, "error", err.Error())
+		service.log.Error("redis hash hlen", "key", key, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -720,7 +721,7 @@ func (service *RedisCacheService) LRpush(key string, args ...[]byte) (int64, err
 	reply, err := conn.Do("lpush", vs...)
 
 	if err != nil {
-		log.Error("redis list lpush", "key", key, "value", args, "error", err.Error())
+		service.log.Error("redis list lpush", "key", key, "value", args, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -740,7 +741,7 @@ func (service *RedisCacheService) LLpush(key string, args ...[]byte) (int64, err
 	reply, err := conn.Do("rpush", vs...)
 
 	if err != nil {
-		log.Error("redis list rpush", "key", key, "value", args, "error", err.Error())
+		service.log.Error("redis list rpush", "key", key, "value", args, "error", err.Error())
 		return 0, err
 	} else {
 		res := reply.(int64)
@@ -755,10 +756,10 @@ func (service *RedisCacheService) LRpop(key string) ([]byte, error) {
 	reply, err := conn.Do("rpop", key)
 
 	if nil != err {
-		log.Error("redis list rpop", "key", key, "error", err.Error())
+		service.log.Error("redis list rpop", "key", key, "error", err.Error())
 		return []byte{}, err
 	} else if nil == reply {
-		log.Debug("redis list rpop", "key", key)
+		service.log.Debug("redis list rpop", "key", key)
 		return []byte{}, err
 	} else {
 		return reply.([]byte), err
@@ -772,10 +773,10 @@ func (service *RedisCacheService) LLpop(key string) ([]byte, error) {
 	reply, err := conn.Do("lpop", key)
 
 	if nil != err {
-		log.Error("redis list lpop", "key", key, "error", err.Error())
+		service.log.Error("redis list lpop", "key", key, "error", err.Error())
 		return []byte{}, err
 	} else if nil == reply {
-		log.Debug("redis list lpop", "key", key)
+		service.log.Debug("redis list lpop", "key", key)
 		return []byte{}, err
 	} else {
 		return reply.([]byte), err
@@ -793,10 +794,10 @@ func (service *RedisCacheService) LIndex(key string, index int64) ([]byte, error
 	reply, err := conn.Do("lindex", vs)
 
 	if nil != err {
-		log.Error("redis list lindex", "key", key, "index", index, "error", err.Error())
+		service.log.Error("redis list lindex", "key", key, "index", index, "error", err.Error())
 		return []byte{}, err
 	} else if nil == reply {
-		log.Debug("redis list lindex", "key", key, "index", index)
+		service.log.Debug("redis list lindex", "key", key, "index", index)
 		return []byte{}, err
 	} else {
 		return reply.([]byte), err

@@ -7,6 +7,12 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "H3FDPhlDUezdffSiSJSGwkM5/1Y=",
+			"path": "cloud.google.com/go/civil",
+			"revision": "da62cf105f42c5332a88ddc80ebc7219ac9e70d3",
+			"revisionTime": "2018-08-07T19:20:56Z"
+		},
+		{
 			"checksumSHA1": "3KhDEC5MM0iyN+FsLfxpnvFVeuY=",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "8991bc29aa16c548c550c7ff78260e27b9ab7c73",
@@ -17,6 +23,24 @@
 			"path": "github.com/davecgh/go-spew/spew/testdata",
 			"revision": "8991bc29aa16c548c550c7ff78260e27b9ab7c73",
 			"revisionTime": "2018-02-21T22:46:20Z"
+		},
+		{
+			"checksumSHA1": "68ZifYORYC3KvlGQ7ZD9ZroLYEg=",
+			"path": "github.com/denisenkom/go-mssqldb",
+			"revision": "242fa5aa1b45aeb9fcdfeee88822982e3f548e22",
+			"revisionTime": "2018-07-07T23:57:34Z"
+		},
+		{
+			"checksumSHA1": "wu8t19t2rmyrrfDfdu9v7f/+iag=",
+			"path": "github.com/denisenkom/go-mssqldb/internal/cp",
+			"revision": "242fa5aa1b45aeb9fcdfeee88822982e3f548e22",
+			"revisionTime": "2018-07-07T23:57:34Z"
+		},
+		{
+			"checksumSHA1": "fyQ6D2LUvzhSnGxDSXPARWONPtg=",
+			"path": "github.com/erikstmartin/go-testdb",
+			"revision": "8d10e4a1bae52cd8b81ffdec3445890d6dccab3d",
+			"revisionTime": "2016-02-19T21:45:06Z"
 		},
 		{
 			"checksumSHA1": "8WT/IcUGayBlQXNL6HI9da1No4s=",
@@ -41,6 +65,10 @@
 			"path": "github.com/gomodule/redigo/redis",
 			"revision": "2cd21d9966bf7ff9ae091419744f0b3fb0fecace",
 			"revisionTime": "2018-06-27T14:45:07Z"
+		},
+		{
+			"path": "github.com/google/go-cmp/cmp",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "LKVPIXruMhnSdda8oOm1+Np68hY=",
@@ -83,6 +111,42 @@
 			"revisionTime": "2018-07-26T23:43:49Z"
 		},
 		{
+			"checksumSHA1": "8OiZq8vijc7kBDsVRiG5Ns2zEhI=",
+			"path": "github.com/jinzhu/gorm/dialects/mssql",
+			"revision": "409121d9e394922787885b001d148a05e3a42b6c",
+			"revisionTime": "2018-07-26T23:43:49Z"
+		},
+		{
+			"checksumSHA1": "eECxSkwh0WmhLwaxHfkvcLOWS08=",
+			"path": "github.com/jinzhu/gorm/dialects/mysql",
+			"revision": "409121d9e394922787885b001d148a05e3a42b6c",
+			"revisionTime": "2018-07-26T23:43:49Z"
+		},
+		{
+			"checksumSHA1": "0Pry12nZ6UQBd1iXEtszySSfFpI=",
+			"path": "github.com/jinzhu/gorm/dialects/postgres",
+			"revision": "409121d9e394922787885b001d148a05e3a42b6c",
+			"revisionTime": "2018-07-26T23:43:49Z"
+		},
+		{
+			"checksumSHA1": "4VZ1gLZHMumRjV3fclS1aX8S1aQ=",
+			"path": "github.com/jinzhu/gorm/dialects/sqlite",
+			"revision": "409121d9e394922787885b001d148a05e3a42b6c",
+			"revisionTime": "2018-07-26T23:43:49Z"
+		},
+		{
+			"checksumSHA1": "a9OGllyRQRDhWbU2eCKl480H8bY=",
+			"path": "github.com/jinzhu/inflection",
+			"revision": "04140366298a54a039076d798123ffa108fff46c",
+			"revisionTime": "2018-03-08T03:36:59Z"
+		},
+		{
+			"checksumSHA1": "NTRBrQH3n8ZieRgGQh8dDcelROw=",
+			"path": "github.com/jinzhu/now",
+			"revision": "ed742868f2aebdb1c0c437bf4f7257f88834b66f",
+			"revisionTime": "2018-05-11T01:59:16Z"
+		},
+		{
 			"checksumSHA1": "+SIDm752kHQGW36naH9CuMJt/o0=",
 			"path": "github.com/jonboulle/clockwork",
 			"revision": "e7c6d408fd5c44ee1e1d8b79ae32b426afae1f28",
@@ -123,6 +187,28 @@
 			"path": "github.com/lestrrat-go/strftime",
 			"revision": "59966ecb6d84ec0010de6a5b8deae0299ce5b549",
 			"revisionTime": "2018-04-14T11:28:01Z"
+		},
+		{
+			"checksumSHA1": "M+fk3MC3iy77qvFOU9KBvx47apQ=",
+			"path": "github.com/lib/pq",
+			"revision": "90697d60dd844d5ef6ff15135d0203f65d2f53b8",
+			"revisionTime": "2018-05-23T17:54:26Z"
+		},
+		{
+			"checksumSHA1": "BC9Ng4sUc0Nq7ICgwsAzNwUT9A8=",
+			"path": "github.com/lib/pq/hstore",
+			"revision": "90697d60dd844d5ef6ff15135d0203f65d2f53b8",
+			"revisionTime": "2018-05-23T17:54:26Z"
+		},
+		{
+			"path": "github.com/lib/pq/oid",
+			"revision": "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+		},
+		{
+			"checksumSHA1": "e1+suqFcHo6TrQRCyOwIXzuOT30=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "b3511bfdd742af558b54eb6160aca9446d762a19",
+			"revisionTime": "2018-07-18T00:29:43Z"
 		},
 		{
 			"checksumSHA1": "zlUunTm8g3OtCLZfyO9/4OswWxU=",
@@ -371,6 +457,10 @@
 			"path": "github.com/tebeka/strftime",
 			"revision": "3f9c7761e3124a331848c11a2f168afd8b105d9f",
 			"revisionTime": "2014-09-26T08:19:19Z"
+		},
+		{
+			"path": "golang.org/x/crypto/md4",
+			"revision": ""
 		},
 		{
 			"checksumSHA1": "4nPV7YdyHiVRSWaxpy6jHt/MTq4=",

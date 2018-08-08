@@ -47,8 +47,8 @@ func NewRdsService(config MysqlConifg) (*RdsService, error) {
 	return impl, nil
 }
 
-// AddTable add
-func (s *RdsService) AddTable(t interface{}) {
+// RegistTable create table for given object
+func (s *RdsService) RegistTable(t interface{}) {
 	if ok := s.DB.HasTable(t); !ok {
 		if err := s.DB.CreateTable(t).Error; err != nil {
 			log.Fatalf("create mysql table error:%s", err.Error())
@@ -58,8 +58,8 @@ func (s *RdsService) AddTable(t interface{}) {
 	s.DB.AutoMigrate(append(tab, t))
 }
 
-// AddTables create tables for given object
-func (s *RdsService) AddTables(tables []interface{}) {
+// RegistTables create tables for given object
+func (s *RdsService) RegistTables(tables []interface{}) {
 	for _, t := range tables {
 		if ok := s.DB.HasTable(t); !ok {
 			if err := s.DB.CreateTable(t).Error; err != nil {

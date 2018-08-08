@@ -14,7 +14,7 @@ type Order struct {
 
 func newTestRdsService(t *testing.T) (*RdsService, error) {
 
-	config := MysqlOptions{
+	config := MysqlConifg{
 		Hostname:    "127.0.0.1",
 		Port:        "3306",
 		User:        "root",
@@ -38,7 +38,7 @@ func TestAdd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rdsService.Prepare(&Order{})
+	rdsService.RegistTable(&Order{})
 
 	order := Order{
 		OrderHash: "0xeeec6ca7c19ff79562e98c30c5daa9fb88b377a1957c6d4acd48fe47c047c257",
@@ -59,7 +59,7 @@ func TestDel(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rdsService.Prepare()
+	rdsService.RegistTable(&Order{})
 
 	order := Order{
 		OrderHash: "0xeeec6ca7c19ff79562e98c30c5daa9fb88b377a1957c6d4acd48fe47c047c257",
@@ -86,7 +86,7 @@ func TestSave(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rdsService.Prepare()
+	rdsService.RegistTable(&Order{})
 
 	order := Order{
 		OrderHash: "0xeeec6ca7c19ff79562e98c30c5daa9fb88b377a1957c6d4acd48fe47c047c257",
