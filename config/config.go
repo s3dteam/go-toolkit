@@ -21,8 +21,5 @@ func LoadConfig(file string, output interface{}) error {
 	}
 
 	err = v.Unmarshal(&output)
-	if err != nil {
-		return fmt.Errorf(err.Error())
-	}
-	return nil
+	return err
 }
