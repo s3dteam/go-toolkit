@@ -1,9 +1,7 @@
-package config_test
+package config
 
 import (
 	"testing"
-
-	"github.com/webbergao1/go-toolkit/config"
 )
 
 func Test_LoadConfig(t *testing.T) {
@@ -37,27 +35,27 @@ func Test_LoadConfig(t *testing.T) {
 
 	var conf testConf
 	testfile := ""
-	err := config.LoadConfig(testfile, &conf)
+	err := LoadConfig(testfile, &conf)
 	if err != nil {
 		t.Log(err)
 	}
 
 	testfile = "./testdata/app_test.toml"
-	err = config.LoadConfig(testfile, &conf)
+	err = LoadConfig(testfile, &conf)
 	if err != nil {
 		t.Error(err)
 	}
 	t.Logf("conf content: %#v", conf)
 
 	testfile = "./testdata/app_test_no_exist.toml"
-	err = config.LoadConfig(testfile, &conf)
+	err = LoadConfig(testfile, &conf)
 	if err != nil {
 		t.Log(err)
 	}
 
 	testfile = "./testdata/app_test_bad.toml"
 	var conf1 testConf
-	err = config.LoadConfig(testfile, &conf1)
+	err = LoadConfig(testfile, &conf1)
 	if err != nil {
 		t.Log(err)
 	}

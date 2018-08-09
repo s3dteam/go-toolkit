@@ -80,6 +80,10 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 	logLevel := GetLogLevel(level)
 	logDir := options.Path
 	logFileName := options.FileName
+	if logFileName == "" {
+		logFileName = defaultLogFileName
+	}
+
 	printLog := !options.DisableConsole
 	depth := options.Depth
 	maxAge := options.MaxAge
@@ -90,7 +94,7 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 	log.SetLevel(logLevel)
 
 	if options.Write {
-		storeLogDir := filepath.Join(logDir)
+		storeLogDir := logDir
 
 		err := os.MkdirAll(storeLogDir, os.ModePerm)
 		if err != nil {
