@@ -3,7 +3,7 @@ package mysql
 import "database/sql"
 import _ "github.com/go-sql-driver/mysql"
 
-type MysqlOptions struct {
+type MysqlConfig struct {
 	Hostname    string
 	Port        string
 	User        string
@@ -14,20 +14,20 @@ type MysqlOptions struct {
 
 // MysqlService implements mysql service
 type MysqlService struct {
-	options MysqlOptions
-	DB      *sql.DB
+	config MysqlConfig
+	DB     *sql.DB
 }
 
 // NewMysqlService create new mysql service
-func NewMysqlService(opts MysqlOptions) *MysqlService {
+func NewMysqlService(conf MysqlConfig) *MysqlService {
 	service := &MysqlService{}
-	url := opts.User + ":" + opts.Password + "@tcp(" + opts.Hostname + ":" + opts.Port + ")/" + opts.DbName + "?charset=utf8&parseTime=True"
+	url := conf.User + ":" + conf.Password + "@tcp(" + conf.Hostname + ":" + conf.Port + ")/" + conf.DbName + "?charset=utf8&parseTime=True"
 	db, err := sql.Open("mysql", url)
 	if err != nil {
 		// todo : add log
 		return nil
 	}
 	service.DB = db
-	service.options = opts
+	service.config = conf
 	return service
 }
