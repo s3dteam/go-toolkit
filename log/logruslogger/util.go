@@ -1,4 +1,4 @@
-package log
+package logruslogger
 
 import (
 	"fmt"

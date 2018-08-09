@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
-	"github.com/webbergao1/go-toolkit/log"
 )
 
 // LogrusLogger logrus logger
@@ -19,37 +18,37 @@ func (l *LogrusLogger) GetLogger() *logrus.Logger {
 
 // Debug wrapper Debug logger
 func (l *LogrusLogger) Debug(f interface{}, args ...interface{}) {
-	l.log.Debug(log.FormatLog(f, args...))
+	l.log.Debug(FormatLog(f, args...))
 }
 
 // Info wrapper Info logger
 func (l *LogrusLogger) Info(f interface{}, args ...interface{}) {
-	l.log.Info(log.FormatLog(f, args...))
+	l.log.Info(FormatLog(f, args...))
 }
 
 // Warn wrapper Warn logger
 func (l *LogrusLogger) Warn(f interface{}, args ...interface{}) {
-	l.log.Warn(log.FormatLog(f, args...))
+	l.log.Warn(FormatLog(f, args...))
 }
 
 // Printf wrapper Printf logger
 func (l *LogrusLogger) Printf(f interface{}, args ...interface{}) {
-	l.log.Print(log.FormatLog(f, args...))
+	l.log.Print(FormatLog(f, args...))
 }
 
 // Panic wrapper Panic logger
 func (l *LogrusLogger) Panic(f interface{}, args ...interface{}) {
-	l.log.Panic(log.FormatLog(f, args...))
+	l.log.Panic(FormatLog(f, args...))
 }
 
 // Fatal wrapper Fatal logger
 func (l *LogrusLogger) Fatal(f interface{}, args ...interface{}) {
-	l.log.Fatal(log.FormatLog(f, args...))
+	l.log.Fatal(FormatLog(f, args...))
 }
 
 // Error wrapper Error logger
 func (l *LogrusLogger) Error(f interface{}, args ...interface{}) {
-	l.log.Error(log.FormatLog(f, args...))
+	l.log.Error(FormatLog(f, args...))
 }
 
 // Debugln wrapper Debugln logger
