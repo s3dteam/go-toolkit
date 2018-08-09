@@ -24,6 +24,9 @@ func Test_Log(t *testing.T) {
 		log: logruslogger.GetLoggerWithOptions("b-logrus", options),
 	}
 
+	a.log.Debug("")
+	a.log.Debug(time.Now())
+	a.log.Debug(123, time.Now())
 	a.log.Debug("test %v", time.Now().UnixNano())
 	a.log.Warn("test %v", time.Now().UnixNano())
 	a.log.Info("test %v", time.Now().UnixNano())
