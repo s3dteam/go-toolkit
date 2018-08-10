@@ -82,6 +82,7 @@ func Test_Log(t *testing.T) {
 	_ = GetLoggerWithOptions("f-logrus", &optionsF)
 
 	os.RemoveAll(options.Path)
+	t.Logf("clear temp test log files")
 }
 
 func Test_PanicLog(t *testing.T) {
