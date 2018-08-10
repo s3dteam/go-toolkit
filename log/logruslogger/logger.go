@@ -17,8 +17,10 @@ const (
 	defaultLogFileName = "all.logs"
 )
 
-var logMap map[string]*LogrusLogger
-var getLogMutex sync.Mutex
+var (
+	logMap      map[string]*LogrusLogger
+	getLogMutex sync.Mutex
+)
 
 func defaultOptions() *Options {
 	return &Options{
@@ -161,6 +163,6 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 		log: log,
 	}
 	logMap[logName] = curLog
-	fmt.Printf("register logger %v, current loggers: %v\n", logName, logMap)
+	fmt.Printf("register logger %v, store in %v, current loggers: %v\n", logName, logDir, logMap)
 	return curLog
 }
