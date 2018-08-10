@@ -5,15 +5,26 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
-
-	"github.com/ethereum/go-ethereum/config"
-	"github.com/ethereum/go-ethereum/dex/types"
 
 	"github.com/naoina/toml"
 )
 
-func loadConfig(file string, cfg *config.RelayConfig) {
+type RelayConfig struct {
+	Name string
+	Role string
+
+	Redis RedisOptions
+}
+
+func Float64ToByte(f float64) []byte {
+	// 8 precision
+	s := strconv.FormatFloat(f, 'f', 8, 64)
+	return []byte(s)
+}
+
+func loadConfig(file string, cfg *RelayConfig) {
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
@@ -29,7 +40,7 @@ func loadConfig(file string, cfg *config.RelayConfig) {
 }
 
 func InitService() *RedisCacheService {
-	var config_relay1 *config.RelayConfig = &config.RelayConfig{}
+	var config_relay1 *RelayConfig = &RelayConfig{}
 	var config_file1 string = "./pool_test_nopass.toml"
 	loadConfig(config_file1, config_relay1)
 	var redisService *RedisCacheService = &RedisCacheService{}
@@ -38,7 +49,7 @@ func InitService() *RedisCacheService {
 }
 
 func Test_Initialize_nopass(t *testing.T) {
-	var config_relay1 *config.RelayConfig = &config.RelayConfig{}
+	var config_relay1 *RelayConfig = &RelayConfig{}
 	var config_file1 string = "./pool_test_nopass.toml"
 	loadConfig(config_file1, config_relay1)
 	if config_relay1.Name != "miner" {
@@ -62,7 +73,7 @@ func Test_Initialize_nopass(t *testing.T) {
 }
 
 func Test_Initialize_pass(t *testing.T) {
-	var config_relay1 *config.RelayConfig = &config.RelayConfig{}
+	var config_relay1 *RelayConfig = &RelayConfig{}
 	var config_file1 string = "./pool_test_pass.toml"
 	loadConfig(config_file1, config_relay1)
 	if config_relay1.Name != "miner" {
@@ -687,22 +698,22 @@ func Test_ZSet_ZRangeByScore(t *testing.T) {
 
 	// test1
 	redisService.ZAdd("test2", 5, []byte("100.1234"), []byte("v1"))
-	redisService.ZAdd("test2", 5, types.Float64ToByte(100.1234), []byte("v2"))
-	redisService.ZAdd("test2", 5, types.Float64ToByte(200), []byte("v3"))
+	redisService.ZAdd("test2", 5, Float64ToByte(100.1234), []byte("v2"))
+	redisService.ZAdd("test2", 5, Float64ToByte(200), []byte("v3"))
 
 	ret, err := redisService.ZRange("test2", 0, 0, true)
 	if err != nil {
 		t.Errorf("redis set ZRange[0, 1] get fail")
 	}
 	if len(ret) != 2 {
-		t.Errorf("redis set ZRange[0, 1] get fail ", len(ret))
+		t.Errorf("redis set ZRange[0, 1] get fail ")
 	}
 	if string(ret[0]) != "v1" {
-		t.Errorf("redis set ZRange[0, 1] get fail ", string(ret[0]))
+		t.Errorf("redis set ZRange[0, 1] get fail ")
 	}
 
 	if string(ret[1]) != "100.1234" {
-		t.Errorf("redis set ZRange[0, 1] get fail", string(ret[1]))
+		t.Errorf("redis set ZRange[0, 1] get fail")
 	}
 
 	if ret, err := redisService.ZRangeByScore("test2", 100.1234, 100.1234, false); err != nil {
@@ -710,9 +721,9 @@ func Test_ZSet_ZRangeByScore(t *testing.T) {
 	} else if len(ret) != 2 {
 		t.Errorf("redis set ZRangeByScore[0, 100] get fail")
 	} else if string(ret[0]) != "v1" {
-		t.Errorf("redis set ZRangeByScore[0, 1] get fail ", string(ret[0]))
+		t.Errorf("redis set ZRangeByScore[0, 1] get fail ")
 	} else if string(ret[1]) != "v2" {
-		t.Errorf("redis set ZRangeByScore[0, 1] get fail ", string(ret[1]))
+		t.Errorf("redis set ZRangeByScore[0, 1] get fail ")
 	}
 	redisService.Del("test2")
 }

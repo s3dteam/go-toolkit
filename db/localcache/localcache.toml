@@ -1,14 +1,6 @@
 name = "miner"
 role = "manager"
 
-[redis]
-    host = "127.0.0.1"
-    port = "6379"
-    password = ""
-    idle_timeout = 20
-    max_idle = 2
-    max_active = 5
-
 [cache]
 	expire_time = 10
 	cleanup_time = 30
