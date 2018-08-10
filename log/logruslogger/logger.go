@@ -48,8 +48,9 @@ type Options struct {
 	FilePrefix     string
 	FileName       string
 
-	MaxAge       time.Duration
-	RotationTime time.Duration
+	MaxAge        time.Duration
+	RotationCount uint // can`t be set with maxAge at the same time
+	RotationTime  time.Duration
 }
 
 // GetLoggerWithOptions with options config
@@ -79,6 +80,10 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 	}
 	logLevel := GetLogLevel(level)
 	logDir := options.Path
+	if logDir == "" {
+		logDir = os.TempDir()
+	}
+
 	logFileName := options.FileName
 	if logFileName == "" {
 		logFileName = defaultLogFileName
@@ -87,6 +92,7 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 	printLog := !options.DisableConsole
 	depth := options.Depth
 	maxAge := options.MaxAge
+	rotationCount := options.RotationCount
 	rotationTime := options.RotationTime
 	withCallerHook := options.WithCallerHook
 	defaultLogFilePrex := options.FilePrefix
@@ -106,6 +112,7 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 			path+".%Y%m%d%H%M%S",
 			rotatelogs.WithClock(rotatelogs.Local),
 			rotatelogs.WithMaxAge(time.Duration(maxAge)*time.Hour),
+			rotatelogs.WithRotationCount(rotationCount),
 			rotatelogs.WithRotationTime(time.Duration(rotationTime)*time.Hour),
 		)
 		if err != nil {

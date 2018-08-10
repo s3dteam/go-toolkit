@@ -4,7 +4,8 @@
 
 ## usage
 
-`govendor fetch github.com/s3dteam/go-toolkit/log`
+`govendor fetch github.com/s3dteam/go-toolkit/log/^`
+`govendor fetch github.com/s3dteam/go-toolkit/log/logruslogger`
 
 ## example
 
