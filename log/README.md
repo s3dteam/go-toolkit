@@ -4,13 +4,13 @@
 
 ## usage
 
-- use interface log
-
-`govendor fetch github.com/s3dteam/go-toolkit/log/^`
-
 - use without interface log
 
 `govendor fetch github.com/s3dteam/go-toolkit/log/logruslogger`
+
+- use with interface log
+
+`govendor fetch github.com/s3dteam/go-toolkit/log/^`
 
 ## example
 
