@@ -7,12 +7,17 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ethereum/go-ethereum/config"
-
 	"github.com/naoina/toml"
 )
 
-func loadConfig(file string, cfg *config.RelayConfig) {
+type RelayConfig struct {
+	Name string
+	Role string
+
+	Cache CacheOptions
+}
+
+func loadConfig(file string, cfg *RelayConfig) {
 	f, err := os.Open(file)
 	if err != nil {
 		panic(err)
@@ -28,7 +33,7 @@ func loadConfig(file string, cfg *config.RelayConfig) {
 }
 
 func Test_Initialize(t *testing.T) {
-	var config_relay1 *config.RelayConfig = &config.RelayConfig{}
+	var config_relay1 *RelayConfig = &RelayConfig{}
 	var config_file1 string = "./localcache.toml"
 	loadConfig(config_file1, config_relay1)
 	if config_relay1.Name != "miner" {
