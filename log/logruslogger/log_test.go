@@ -70,18 +70,19 @@ func Test_Log(t *testing.T) {
 	c.Debug("test %v", time.Now().UnixNano())
 	c.Warn("test %v", time.Now().UnixNano())
 
-	optionsD := new(Options)
-
-	_ = GetLoggerWithOptions("d-logrus", optionsD)
+	d := GetLoggerWithOptions("d-logrus", nil)
+	d.Debug("123")
 
 	optionsE := *options
 	optionsE.DisableConsole = true
 	_ = GetLoggerWithOptions("e-logrus", &optionsE)
 
-	c.Debug("test %v", time.Now().UnixNano())
-	c.Warn("test %v", time.Now().UnixNano())
+	optionsF := *options
+	optionsF.Path = ""
+	_ = GetLoggerWithOptions("f-logrus", &optionsF)
 
 	os.RemoveAll(options.Path)
+	t.Logf("clear temp test log files")
 }
 
 func Test_PanicLog(t *testing.T) {
@@ -89,7 +90,6 @@ func Test_PanicLog(t *testing.T) {
 	options.WithCallerHook = true
 	options.Depth = 8
 	options.Write = true
-	options.Path = "/logtest"
 
 	a := GetLoggerWithOptions("a-logrus", options)
 	defer func() {
@@ -106,4 +106,31 @@ func Test_PanicLog(t *testing.T) {
 	}()
 
 	a.Panic("fatal test")
+}
+
+func Test_ErrorPath(t *testing.T) {
+	options := &Options{}
+	options.WithCallerHook = true
+	options.Depth = 8
+	options.Write = true
+	options.Path = "/logtest"
+
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("fatal log, err: %v\n", err)
+
+			defer func() {
+				if err := recover(); err != nil {
+					fmt.Printf("fatal log, err: %v\n", err)
+				}
+			}()
+			options.Path = ""
+			options.RotationCount = 1
+			options.MaxAge = 1111
+			_ = GetLoggerWithOptions("aa-logrus", options)
+
+		}
+	}()
+	_ = GetLoggerWithOptions("aa-logrus", options)
+
 }
