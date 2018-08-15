@@ -508,6 +508,27 @@ func (service *RedisCacheService) ZRevRange(key string, start, stop int64, withS
 	return res, err
 }
 
+func (service *RedisCacheService) ZRemRangeByScore(key string, start, stop int64) (int64, error) {
+
+	//log.Info("[REDIS-ZRemRangeByScore] key : " + key)
+
+	conn := service.pool.Get()
+	defer conn.Close()
+
+	vs := []interface{}{}
+	vs = append(vs, key, start, stop)
+
+	reply, err := conn.Do("ZREMRANGEBYSCORE", vs...)
+
+	if err != nil {
+		service.log.Error(" key:%s, err:%s", key, err.Error())
+		return 0, err
+	} else {
+		res := reply.(int64)
+		return res, err
+	}
+}
+
 // -----------------hash operation-------------------
 func (service *RedisCacheService) HSet(key string, ttl int64, field string, value []byte) error {
 	conn := service.pool.Get()
