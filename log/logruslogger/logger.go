@@ -34,6 +34,7 @@ func defaultOptions() *Options {
 		FileName:       defaultLogFileName,
 		MaxAge:         time.Duration(24) * time.Hour,
 		RotationTime:   time.Duration(7*24) * time.Hour,
+		Debug:          false,
 	}
 }
 
@@ -47,12 +48,13 @@ type Options struct {
 	DisableConsole bool
 	Write          bool
 	Path           string
-	FilePrefix     string
 	FileName       string
 
 	MaxAge        time.Duration
 	RotationCount uint // can`t be set with maxAge at the same time
 	RotationTime  time.Duration
+
+	Debug bool // if set true, separate
 }
 
 // GetLoggerWithOptions with options config
@@ -97,7 +99,6 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 	rotationCount := options.RotationCount
 	rotationTime := options.RotationTime
 	withCallerHook := options.WithCallerHook
-	defaultLogFilePrex := options.FilePrefix
 
 	log.SetLevel(logLevel)
 
@@ -111,7 +112,7 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 
 		path := filepath.Join(storeLogDir, logFileName)
 		writer, err := rotatelogs.New(
-			path+".%Y%m%d%H%M%S",
+			path+".%Y%m%d%H%M",
 			rotatelogs.WithClock(rotatelogs.Local),
 			rotatelogs.WithMaxAge(time.Duration(maxAge)*time.Hour),
 			rotatelogs.WithRotationCount(rotationCount),
@@ -127,29 +128,34 @@ func GetLoggerWithOptions(logName string, options *Options) *LogrusLogger {
 		if options.Formatter == "json" {
 			formatter = &logrus.JSONFormatter{}
 		}
+		if options.Debug {
+			log.AddHook(lfshook.NewHook(
+				lfshook.WriterMap{
+					logrus.DebugLevel: writer,
+					logrus.InfoLevel:  writer,
+					logrus.WarnLevel:  writer,
+					logrus.ErrorLevel: writer,
+					logrus.FatalLevel: writer,
+				},
+				formatter,
+			))
 
-		log.AddHook(lfshook.NewHook(
-			lfshook.WriterMap{
-				logrus.DebugLevel: writer,
-				logrus.InfoLevel:  writer,
-				logrus.WarnLevel:  writer,
-				logrus.ErrorLevel: writer,
-				logrus.FatalLevel: writer,
-			},
-			formatter,
-		))
-
-		pathMap := lfshook.PathMap{
-			logrus.DebugLevel: fmt.Sprintf("%s/%sdebug.log", storeLogDir, defaultLogFilePrex),
-			logrus.InfoLevel:  fmt.Sprintf("%s/%sinfo.log", storeLogDir, defaultLogFilePrex),
-			logrus.WarnLevel:  fmt.Sprintf("%s/%swarn.log", storeLogDir, defaultLogFilePrex),
-			logrus.ErrorLevel: fmt.Sprintf("%s/%serror.log", storeLogDir, defaultLogFilePrex),
-			logrus.FatalLevel: fmt.Sprintf("%s/%sfatal.log", storeLogDir, defaultLogFilePrex),
+			defaultLogFilePrex := logFileName + "."
+			pathMap := lfshook.PathMap{
+				logrus.DebugLevel: fmt.Sprintf("%s/%sdebug", storeLogDir, defaultLogFilePrex),
+				logrus.InfoLevel:  fmt.Sprintf("%s/%sinfo", storeLogDir, defaultLogFilePrex),
+				logrus.WarnLevel:  fmt.Sprintf("%s/%swarn", storeLogDir, defaultLogFilePrex),
+				logrus.ErrorLevel: fmt.Sprintf("%s/%serror", storeLogDir, defaultLogFilePrex),
+				logrus.FatalLevel: fmt.Sprintf("%s/%sfatal", storeLogDir, defaultLogFilePrex),
+			}
+			log.AddHook(lfshook.NewHook(
+				pathMap,
+				formatter,
+			))
+		} else {
+			log.Out = writer
 		}
-		log.AddHook(lfshook.NewHook(
-			pathMap,
-			formatter,
-		))
+
 	} else {
 		if printLog {
 			log.Out = os.Stdout

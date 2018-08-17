@@ -13,6 +13,9 @@ func Test_Log(t *testing.T) {
 	options.WithCallerHook = true
 	options.Depth = 8
 	options.Write = true
+	options.RotationTime = time.Duration(2 * time.Second)
+	options.Debug = true
+
 	tempTestLog := "testLogDir201808091811"
 	dir, _ := os.Getwd()
 
