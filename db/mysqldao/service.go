@@ -1,10 +1,12 @@
 package mysqldao
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql" // init mysql
 )
 
 // MysqlConifg implements config
@@ -15,7 +17,11 @@ type MysqlConifg struct {
 	Password    string
 	DbName      string
 	TablePrefix string
-	Debug       bool
+
+	MaxOpenConnections int
+	MaxIdleConnections int
+	ConnMaxLifetime    int // unit second
+	Debug              bool
 }
 
 // RdsService
@@ -29,18 +35,48 @@ func NewRdsService(config MysqlConifg) (*RdsService, error) {
 	impl := &RdsService{}
 	impl.config = config
 
+	// "root@tcp(127.0.0.1:3306)/s3d?charset=utf8"
+	password := config.Password
+	if password != "" {
+		password = fmt.Sprintf(":%s", password)
+	}
+
+	url := fmt.Sprintf("%s%s@%s(%s:%s)/%s?charset=utf8mb4&parseTime=True", config.User, password, "tcp", config.Hostname, config.Port,
+		config.DbName)
+
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 		return config.TablePrefix + defaultTableName
 	}
-
-	url := config.User + ":" + config.Password + "@tcp(" + config.Hostname + ":" + config.Port + ")/" + config.DbName + "?charset=utf8&parseTime=True"
 	db, err := gorm.Open("mysql", url)
 	if err != nil {
 		log.Fatalf("mysql connection error:%s", err.Error())
 		return nil, err
 	}
 
+	maxOpenConns := config.MaxOpenConnections
+	if maxOpenConns < 5 {
+		maxOpenConns = 5
+	}
+
+	db.DB().SetMaxOpenConns(maxOpenConns)
+
+	maxIdleConns := config.MaxIdleConnections
+	if maxIdleConns < 1 {
+		maxIdleConns = 1
+	}
+	db.DB().SetMaxIdleConns(maxIdleConns)
+
+	connMaxLifeTime := config.ConnMaxLifetime
+	if connMaxLifeTime < 30 {
+		connMaxLifeTime = 30
+	}
+	db.DB().SetConnMaxLifetime(time.Duration(connMaxLifeTime) * time.Second)
+
 	db.LogMode(config.Debug)
+	err = db.DB().Ping()
+	if err != nil {
+		panic(fmt.Sprintf("init mysql db err: %v", err))
+	}
 
 	impl.DB = db
 

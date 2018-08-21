@@ -8,8 +8,8 @@ type Order struct {
 	ID        int    `gorm:"column:id;primary_key;"`
 	OrderHash string `gorm:"column:order_hash;type:varchar(82)"`
 	Market    string `gorm:"column:market;type:varchar(40)"`
-	Side      string `gorm:"column:side;type:varchar(40)`
-	OrderType string `gorm:"column:order_type;type:varchar(40)`
+	Side      string `gorm:"column:side;type:varchar(40)"`
+	OrderType string `gorm:"column:order_type;type:varchar(40)"`
 }
 
 func newTestRdsService(t *testing.T) (*RdsService, error) {
