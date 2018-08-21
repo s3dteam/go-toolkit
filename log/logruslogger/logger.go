@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultLevel       = "level"
+	defaultLevel       = "debug"
 	defaultLogFileName = "all.logs"
 )
 
