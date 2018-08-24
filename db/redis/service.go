@@ -26,11 +26,12 @@ type RedisCacheService struct {
 }
 
 // Initialize redis service init
-func (service *RedisCacheService) Initialize(redisCfg interface{}) {
+func (service *RedisCacheService) Initialize(redisCfg interface{}, l *log.Logger) {
 	options, ok := redisCfg.(RedisOptions)
 	if !ok {
 		panic("redis service config error!")
 	}
+	service.log = *l
 	service.options = options
 	service.pool = &redis.Pool{
 		IdleTimeout: time.Duration(options.IdleTimeout) * time.Second,
